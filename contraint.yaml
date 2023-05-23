@@ -20,7 +20,7 @@ spec:
                     type: boolean
                   pathPrefix:
                     type: string
-                  exemptPods
+                  exemptPods:
                     type: array
                     items:
                       type: string
