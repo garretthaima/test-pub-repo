@@ -166,6 +166,7 @@ spec:
         }
       libs:
         - |
+          package lib.exclude_container_image
           is_excluded(container) {
               exclude_images := object.get(object.get(input, "parameters", {}), "excludedImages", [])
               img := container.image
