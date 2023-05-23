@@ -40,7 +40,7 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sazurecustomhostfilesystem
+        package k8sazurev3hostfilesystem
 
         import data.lib.exclude_container_image.is_excluded
 
@@ -54,7 +54,7 @@ spec:
             volume := input_hostpath_volumes[_]
             allowedPaths := get_allowed_paths(input)
             exemptPods := get_exempt_pods(input)
-            not input_hostpath_allowed(allowedPaths, volume)
+            not input_hostpath_allowed(allowedPaths, volume, exemptPods)
             msg := sprintf("HostPath volume %v is not allowed, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
         }
         
@@ -63,9 +63,10 @@ spec:
             not input.review.object.spec.nodeSelector["kubernetes.io/os"] == "windows"
             volume := input_hostpath_volumes[_]
             allowedPaths := get_allowed_paths(input)
+            exemptPods := get_exempt_pods(input)
             allowedHostPath := allowedPaths[_]
             allowedHostPath.readOnly
-            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path, exemptPods)
             writeable_input_volume_mounts(volume.name)
             msg := sprintf("HostPath volume %v does not meet the readonly requirement, pod: %v. Allowed path: %v", [volume, input.review.object.metadata.name, allowedPaths])
         }
@@ -108,6 +109,9 @@ spec:
         path_matches(prefix, path) {
             a := path_array(prefix)
             b := path_array(path)
+            container := input_containers[_]
+            exempt_containers := exemptPods[_]
+            not contains_exempt_pods(exempt_containers, container)
             prefix_matches(a, b)
         }
         path_array(p) = out {
@@ -162,7 +166,6 @@ spec:
         }
       libs:
         - |
-          package lib.exclude_container_image
           is_excluded(container) {
               exclude_images := object.get(object.get(input, "parameters", {}), "excludedImages", [])
               img := container.image
