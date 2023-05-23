@@ -106,7 +106,7 @@ spec:
 
         # This allows "/foo", "/foo/", "/foo/bar" etc., but
         # disallows "/fool", "/etc/foo" etc.
-        path_matches(prefix, path) {
+        path_matches(prefix, path, exemptPods) {
             a := path_array(prefix)
             b := path_array(path)
             container := input_containers[_]
