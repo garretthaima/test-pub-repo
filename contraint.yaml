@@ -137,10 +137,6 @@ spec:
             has_field(v, "hostPath")
         }
 
-        input_hostpath_pods[p] {
-          p := 
-        }
-
         mounted_volumes[volumes] {
             container := input_containers[_]
             not is_excluded(container)
@@ -166,7 +162,6 @@ spec:
         }
       libs:
         - |
-          package lib.exclude_container_image
           is_excluded(container) {
               exclude_images := object.get(object.get(input, "parameters", {}), "excludedImages", [])
               img := container.image
