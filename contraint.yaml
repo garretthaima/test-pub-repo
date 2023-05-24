@@ -40,7 +40,7 @@ spec:
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |
-        package k8sazurev3hostfilesystem
+        package k8sazurecustomhostfilesystem
 
         import data.lib.exclude_container_image.is_excluded
 
@@ -87,7 +87,7 @@ spec:
             out = arg.parameters.exemptPods
         }
 
-        input_hostpath_allowed(allowedPaths, volume, exempt_pods) {
+        input_hostpath_allowed(allowedPaths, volume, exemptPods) {
             allowedHostPath := allowedPaths[_]
             container := input_containers[_]
             exempt_containers := exemptPods[_]
