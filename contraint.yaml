@@ -91,8 +91,7 @@ spec:
             allowedHostPath := allowedPaths[_]
             container := input_containers[_]
             exempt_containers := exemptPods[_]
-            not contains_exempt_pods(exempt_containers, container)
-            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path)
+            path_matches(allowedHostPath.pathPrefix, volume.hostPath.path, exempt_containers)
         }
 
         writeable_input_volume_mounts(volume_name) {
